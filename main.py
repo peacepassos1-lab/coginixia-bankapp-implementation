@@ -48,4 +48,4 @@ app.include_router(auth_router)
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to the Bank App API!"}
+    return {"message": "Welcome to the Bank App REST API! - Deployed via CI/CD"}
