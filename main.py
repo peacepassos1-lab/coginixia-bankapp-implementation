@@ -1,11 +1,12 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.inmemory import InMemoryBackend
 from controllers.customer_controller import router as customer_router
 from controllers.account_controller import router as account_router
-from database import customers_collection
 from auth.auth_controller import router as auth_router
+from database import customers_collection
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -42,10 +43,19 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Bank App REST API", lifespan=lifespan)
 
+# Allow frontend to call the API from a different origin
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(auth_router)
 app.include_router(customer_router)
 app.include_router(account_router)
-app.include_router(auth_router)
 
 @app.get("/")
-def read_root():
+def root():
     return {"message": "Welcome to the Bank App REST API! - Deployed via CI/CD"}
