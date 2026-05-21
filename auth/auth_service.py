@@ -18,9 +18,13 @@ def hash_password(plain_password: str):
 def verify_password(plain_password: str, hashed_password: str):
     return password_context.verify(plain_password, hashed_password)
 
-def create_access_token(username: str):
+def create_access_token(username: str, role: str):
     expire_time = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    token_data = {"sub": username, "exp": expire_time}
+    token_data = {
+        "sub": username,
+        "role": role,
+        "exp": expire_time
+    }
     token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
     return token
 
@@ -40,19 +44,22 @@ def login_user(username: str, password: str):
     user = users_collection.find_one({"username": username})
     if user is None:
         return None
-    
+
     password_matches = verify_password(password, user["password"])
     if not password_matches:
         return None
-    token = create_access_token(username)
-    return {"access_token": token, "token_type": "bearer"}
+
+    role = user.get("role", "user")
+    token = create_access_token(username, role)
+    return {"access_token": token, "token_type": "bearer", "role": role}
 
 def verify_token(token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username = payload.get("sub")
+        role = payload.get("role", "user")
         if username is None:
             return None
-        return username
+        return {"username": username, "role": role}
     except JWTError:
         return None
