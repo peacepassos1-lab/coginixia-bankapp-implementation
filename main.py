@@ -6,7 +6,7 @@ from fastapi_cache.backends.inmemory import InMemoryBackend
 from controllers.customer_controller import router as customer_router
 from controllers.account_controller import router as account_router
 from auth.auth_controller import router as auth_router
-from database import customers_collection
+from database import customers_collection, users_collection
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
