@@ -29,7 +29,11 @@ def register_user(username: str, password: str):
     if existing_user:
         return None
     hashed_password = hash_password(password)
-    users_collection.insert_one({"username": username, "password": hashed_password})
+    users_collection.insert_one({
+        "username": username,
+        "password": hashed_password,
+        "role": "user"
+    })
     return {"message": "User registered successfully"}
 
 def login_user(username: str, password: str):

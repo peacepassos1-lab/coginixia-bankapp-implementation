@@ -1,8 +1,12 @@
 from database import customers_collection
 from models.customer import Account
 
-def get_all_accounts():
-    all_customers = customers_collection.find()
+def get_all_accounts(username: str = None):
+    if username:
+        all_customers = customers_collection.find({"created_by": username})
+    else:
+        all_customers = customers_collection.find()
+
     all_accounts = []
 
     for customer_data in all_customers:
@@ -16,11 +20,15 @@ def get_all_accounts():
             all_accounts.append(account)
     return all_accounts
 
-def get_accounts_by_customer_id(customer_id):
-    customer_data = customers_collection.find_one({"id": customer_id})
+def get_accounts_by_customer_id(customer_id, username: str = None):
+    if username:
+        customer_data = customers_collection.find_one({"id": customer_id, "created_by": username})
+    else:
+        customer_data = customers_collection.find_one({"id": customer_id})
+
     if customer_data is None:
         return None
-    
+
     accounts_list = []
     for account_data in customer_data["accounts"]:
         account = Account(
@@ -32,9 +40,8 @@ def get_accounts_by_customer_id(customer_id):
         accounts_list.append(account)
     return accounts_list
 
-
-def get_premium_accounts():
-    all_accounts = get_all_accounts()
+def get_premium_accounts(username: str = None):
+    all_accounts = get_all_accounts(username=username)
     premium_accounts = []
 
     for account in all_accounts:

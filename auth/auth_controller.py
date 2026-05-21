@@ -10,10 +10,9 @@ security = HTTPBearer()
 @router.post("/register")
 def register(user: UserRegister):
     result = auth_service.register_user(user.username, user.password)
-
     if result is None:
         raise HTTPException(status_code=400, detail="Username already exists")
-    return result   
+    return result  
 
 @router.post("/login")
 def login(user: UserLogin):

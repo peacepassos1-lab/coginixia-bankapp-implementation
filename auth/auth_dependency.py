@@ -6,8 +6,8 @@ security = HTTPBearer()
 
 def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     token = credentials.credentials
-    username = auth_service.verify_token(token)
+    user_info = auth_service.verify_token(token)
 
-    if username is None:
+    if user_info is None:
         raise HTTPException(status_code=401, detail="Invalid or expired token")
-    return username
+    return user_info

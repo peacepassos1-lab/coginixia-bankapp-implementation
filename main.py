@@ -17,6 +17,7 @@ async def lifespan(app: FastAPI):
             {
                 "id"      : 1,
                 "name"    : "Alice",
+                "created_by": "admin",
                 "accounts": [
                     {
                         "id"            : 1,
@@ -29,6 +30,7 @@ async def lifespan(app: FastAPI):
             {
                 "id"      : 2,
                 "name"    : "Bob",
+                "created_by": "admin",
                 "accounts": [
                     {
                         "id"            : 2,
@@ -39,6 +41,16 @@ async def lifespan(app: FastAPI):
                 ]
             }
         ])
+
+    # Create admin account if none exists
+    if users_collection.count_documents({"role": "admin"}) == 0:
+        from auth.auth_service import hash_password
+        users_collection.insert_one({
+            "username": "admin",
+            "password": hash_password("admin123"),
+            "role": "admin"
+        })
+
     yield
 
 app = FastAPI(title="Bank App REST API", lifespan=lifespan)
